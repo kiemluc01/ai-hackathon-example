@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: skill-studio-db
+    environment:
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: studio
+      POSTGRES_DB: studio
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio -d studio"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    container_name: skill-studio-api
+    environment:
+      DATABASE_URL: postgresql+psycopg://studio:studio@db:5432/studio
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      SEED_PACK_DIR: /seed/.claude
+      SEED_ON_STARTUP: "true"
+    ports:
+      - "8080:8000"
+    volumes:
+      # Live reload during development.
+      - ./backend/app:/app/app
+      # The real Context Pack in this repo, used to seed an empty database.
+      - ./.claude:/seed/.claude:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+volumes:
+  db_data:
