@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-ink text-slate-200 antialiased;
+}
+
+/* React Flow surface tuned for the dark shell */
+.react-flow__edge-path {
+  stroke: #6366f1;
+  stroke-width: 2;
+}
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: #6366f1;
+  border: 2px solid #0b1020;
+}
+.react-flow__attribution {
+  display: none;
+}
